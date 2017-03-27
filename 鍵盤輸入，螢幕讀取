@@ -1,6 +1,6 @@
-#include <Key.h>
+#include <SevSeg.h>
 #include <Keypad.h>
-
+SevSeg sevseg;
 const byte ROWS = 4; // 4 Rows
 const byte COLS = 4; // 4 Columns
 char keys[ROWS][COLS] = {
@@ -11,14 +11,28 @@ char keys[ROWS][COLS] = {
 };
 byte rowPins[ROWS] = {5, 4, 3, 2};
 byte colPins[COLS] = {9, 8, 7, 6};
-Keypad keypad =
-Keypad(makeKeymap(keys),rowPins,colPins, ROWS, COLS );
+Keypad keypad =Keypad(makeKeymap(keys),rowPins,colPins, ROWS, COLS );
 void setup(){
+  byte numDigits = 1;
+  byte digitPins[] = {A5};
+  byte segmentPins[] = {10, 11, 12, 13, A0, A1, A2};
+  sevseg.begin(COMMON_CATHODE, numDigits, digitPins,segmentPins);
   Serial.begin(9600);
 }
 void loop(){
+  char k;
   char key = keypad.getKey();
   if (key != NO_KEY){
+    if(key>='A' && key<='Z')
+    {
+      k=key-'A';
+    }
+    else
+      k=key-'0';
+   sevseg.setNumber(k, 0);
+   sevseg.refreshDisplay();
    Serial.println(key);
   }
+  else
+    sevseg.refreshDisplay();
 }
